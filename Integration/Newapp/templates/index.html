@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Styled Payment, SMS, and Email Form</title>
+
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+    integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #7f5eff, #61dafb);
+      color: #333;
+    }
+
+    /* ==== Payment Section ==== */
+    .payment-section {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 60px 20px;
+      text-align: center;
+      background: #fff;
+      margin: 40px auto;
+      max-width: 500px;
+      border-radius: 18px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    .payment-section:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
+    }
+
+    .payment-section h2 {
+      margin-bottom: 15px;
+      font-size: 1.6rem;
+      color: #444;
+    }
+
+    .payment-section input[type="text"] {
+      width: 100%;
+      max-width: 250px;
+      padding: 10px 14px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      font-size: 1rem;
+      outline: none;
+      transition: 0.2s;
+    }
+
+    .payment-section input[type="text"]:focus {
+      border-color: #7f5eff;
+      box-shadow: 0 0 0 3px rgba(127, 94, 255, 0.15);
+    }
+
+    .payment-section button {
+      background: linear-gradient(135deg, #7f5eff, #5e9dff);
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .payment-section button:hover {
+      background: linear-gradient(135deg, #6a48ff, #4c8aff);
+    }
+
+    hr {
+      border: none;
+      height: 1px;
+      background: rgba(255, 255, 255, 0.3);
+      margin: 40px auto;
+      max-width: 80%;
+    }
+
+    /* ==== SMS Section ==== */
+    #sms-section {
+      background: #fff;
+      border-radius: 18px;
+      padding: 30px;
+      max-width: 720px;
+      margin: 40px auto;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    }
+
+    #sms-section h2 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 10px;
+    }
+
+    #sms-section input,
+    #sms-section textarea {
+      border-radius: 8px;
+      transition: 0.2s;
+    }
+
+    #sms-section input:focus,
+    #sms-section textarea:focus {
+      border-color: #7f5eff;
+      box-shadow: 0 0 0 3px rgba(127, 94, 255, 0.15);
+    }
+
+    #sendBtn {
+      background: linear-gradient(135deg, #7f5eff, #5e9dff) !important;
+      opacity: 1 !important;
+    }
+
+    #sendBtn:hover {
+      background: linear-gradient(135deg, #6a48ff, #4c8aff) !important;
+    }
+
+    #clearBtn:hover {
+      background: #f4f4f4;
+    }
+
+    /* ==== Email Section ==== */
+    .email-section {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 40px 20px 80px;
+      background: transparent;
+    }
+
+    .email-card {
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+      padding: 35px 40px;
+      width: 100%;
+      max-width: 550px;
+      transition: all 0.3s ease;
+    }
+
+    .email-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
+    }
+
+    .email-card h2 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #777;
+      margin-bottom: 25px;
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 18px;
+    }
+
+    .input-group label {
+      font-weight: 500;
+      margin-bottom: 6px;
+      color: #444;
+    }
+
+    .input-group input,
+    .input-group textarea {
+      padding: 10px 12px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      outline: none;
+      font-size: 14px;
+      transition: 0.2s;
+    }
+
+    .input-group input:focus,
+    .input-group textarea:focus {
+      border-color: #7f5eff;
+      box-shadow: 0 0 0 3px rgba(127, 94, 255, 0.15);
+    }
+
+    .button-group {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 15px;
+    }
+
+    .send-btn,
+    .reset-btn {
+      flex: 1;
+      padding: 10px 20px;
+      border: none;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .send-btn {
+      background: linear-gradient(135deg, #7f5eff, #5e9dff);
+      color: #fff;
+      margin-right: 10px;
+    }
+
+    .send-btn:hover {
+      background: linear-gradient(135deg, #6a48ff, #4c8aff);
+    }
+
+    .reset-btn {
+      background: #f1f1f1;
+      color: #555;
+    }
+
+    .reset-btn:hover {
+      background: #e3e3e3;
+    }
+
+    @media (max-width: 600px) {
+      .email-card {
+        padding: 25px 20px;
+      }
+
+      .button-group {
+        flex-direction: column;
+      }
+
+      .send-btn,
+      .reset-btn {
+        width: 100%;
+        margin: 6px 0;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Payment Section -->
+  <section class="payment-section">
+    <h2>💳 Razorpay Payment</h2>
+    <input type="text" name="amt" id="amt" placeholder="Enter Amount (INR)" />
+    <button id="rzp-button1">Pay with Razorpay</button>
+  </section>
+
+   <hr>
+    <section id="sms-section"
+        style="max-width:720px;margin:24px auto;padding:18px;border-radius:12px;box-shadow:0 6px 18px rgba(0,0,0,.08);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,'Helvetica Neue',Arial;">
+        <h2 style="margin:0 0 10px;font-size:1.25rem;">Send SMS</h2>
+
+        <form action="{%url 'sms'%}" id="sms-form" novalidate>
+            <!-- Phone input -->
+            <label for="phone" style="display:block;margin-bottom:6px;font-weight:600;">Phone number</label>
+            <input id="phone" name="phone" inputmode="tel" autocomplete="tel" placeholder="+919988776655"
+                aria-describedby="phoneHelp" required
+                style="width:100%;padding:10px 12px;border-radius:8px;border:1px solid #d6d6d6;font-size:1rem;box-sizing:border-box;" />
+            <div id="phoneHelp" style="margin-top:6px;color:#666;font-size:.875rem;">Use international format:
+                <code>+{country}{number}</code> (e.g. <code>+919988776655</code>).
+            </div>
+
+            <!-- Message textarea -->
+            <div style="margin-top:14px;">
+                <label for="message" style="display:block;margin-bottom:6px;font-weight:600;">Message</label>
+                <textarea id="message" name="message" rows="4" maxlength="160"
+                    placeholder="Enter your SMS message (max 160 characters)" aria-describedby="msgHelp" required
+                    style="width:100%;padding:10px 12px;border-radius:8px;border:1px solid #d6d6d6;font-size:1rem;box-sizing:border-box;resize:vertical;"></textarea>
+                <div id="msgHelp"
+                    style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;color:#666;font-size:.875rem;">
+                    <span>Standard SMS length: 160 chars</span>
+                    <span id="charCount">160</span>
+                </div>
+            </div>
+
+            <!-- Action row -->
+            <div style="display:flex;gap:10px;align-items:center;margin-top:16px;">
+                <button id="sendBtn" type="submit"
+                    style="background:#0f62fe;color:white;padding:10px 16px;border-radius:10px;border:0;font-weight:600;cursor:pointer;opacity:.6;">
+                    Send
+                </button>
+
+                <button id="clearBtn" type="button"
+                    style="background:transparent;border:1px solid #d6d6d6;padding:8px 12px;border-radius:10px;cursor:pointer;">
+                    Clear
+                </button>
+
+                <div id="status" role="status" aria-live="polite" style="margin-left:auto;color:#333;font-size:.95rem;">
+                </div>
+            </div>
+        </form>
+    </section>
+    <hr>
+
+  <!-- Email Section -->
+    <section class="email-section">
+        <div class="email-card">
+            <h2>📧 Send an Email</h2>
+            <p class="subtitle">Fill in the details below and hit send.</p>
+            <span>{{result}}</span>
+            <form action="{%url 'email'%}">
+                <div class="input-group">
+                    <label for="email-to">To</label>
+                    <input type="email" id="email-to" name="email-to" placeholder="recipient@example.com" required>
+                </div>
+
+
+
+                <div class="input-group">
+                    <label for="subject">Subject</label>
+                    <input type="text" id="subject" name="subject" placeholder="Enter subject here..." required>
+                </div>
+
+                <div class="input-group">
+                    <label for="message">Message</label>
+                    <textarea id="message" name="message" placeholder="Write your message..." rows="5"
+                        required></textarea>
+                </div>
+
+
+
+                <div class="button-group">
+                    <button type="submit" class="send-btn">Send Email</button>
+                    <button type="reset" class="reset-btn">Clear</button>
+                </div>
+            </form>
+        </div>
+    </section>
+
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script>
+    document.getElementById('rzp-button1').onclick = function (e) {
+      e.preventDefault();
+      var amt = $("#amt").val();
+      if (!amt) {
+        alert("Please enter an amount");
+        return;
+      }
+
+      $.get('payment', { amt }, function (rt) {
+        var options = {
+          "key": "rzp_test_RZXLQPG4IXJQB3",
+          "amount": rt.amount,
+          "currency": "INR",
+          "name": "Acme Corp",
+          "description": "Test Transaction",
+          "order_id": rt.id,
+          "handler": function (response) {
+            alert("Payment successful!");
+            console.log(response);
+          },
+          "theme": {
+            "color": "#7f5eff"
+          }
+        };
+        var rzp1 = new Razorpay(options);
+        rzp1.open();
+      });
+    };
+  </script>
+</body>
+</html>

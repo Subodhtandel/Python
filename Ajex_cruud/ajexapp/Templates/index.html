@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+
+    <style>
+        .container-fluid { max-width: 1400px; }
+        .card { border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+    </style>
+
+    <script>
+        $(document).ready(function () {
+            load()
+            loadDept()
+        })
+
+        function loadDept() {
+            $.get('deptdisplay', {}, function (rt) {
+                let options = `<option value="">Select Department</option>`
+                rt.data.map(ele => {
+                    options += `<option value="${ele.id}">${ele.name}</option>`
+                })
+                $("#dept").html(options)
+            })
+        }
+
+        function load() {
+            $.get('display', {}, function (rt) {
+                console.log(rt.data);
+
+                let rows = ""
+                rt.data.map(ele => {
+                    rows += `<tr>
+                                <td>${ele.id}</td>
+                                <td>${ele.department__name}</td> 
+                                <td>${ele.name}</td>
+                                <td>${ele.email}</td>
+                                <td>${ele.phone}</td>
+                                <td>${ele.age}</td>
+                                <td><button class='btn btn-primary' onclick='databyid(${ele.id})'>Update</button>
+                                    <button class='btn btn-danger mt-1' onclick='deleteStudent(${ele.id})'>Delete</button></td>
+                            </tr>`
+                })
+                $("#tdata").html(rows)
+            })
+        }
+        
+        // MODIFIED search function
+        function search() {
+            var value = $("#search").val(); // Get value from search input
+            
+            $.get('search', {value: value}, function (rt) {
+
+                let rows = ""
+                rt.data.map(ele => {
+                    rows += `<tr>
+                                <td>${ele.id}</td>
+                                <td>${ele.department__name}</td> 
+                                <td>${ele.name}</td>
+                                <td>${ele.email}</td>
+                                <td>${ele.phone}</td>
+                                <td>${ele.age}</td>
+                                <td><button class='btn btn-primary' onclick='databyid(${ele.id})'>Update</button>
+                                    <button class='btn btn-danger mt-1' onclick='deleteStudent(${ele.id})'>Delete</button></td>
+                            </tr>`
+                })
+                $("#tdata").html(rows)
+            })
+        }
+
+
+
+        function deleteStudent(id) {
+            if (!confirm("Are you sure you want to delete this student?")) {
+                return;
+            }
+            $.ajax({
+                url: 'delete', 
+                type: 'GET',
+                data: { id: id },
+                success: function (rt) {
+                    alert(rt.message);
+                    load();
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    
+                    try {
+                        const errorJson = JSON.parse(jqXHR.responseText);
+                        alert("Deletion Error: " + errorJson.error);
+                    } catch (e) {
+                        
+                        alert("An unrecoverable server error occurred during deletion. Status: " + jqXHR.status);
+                        console.error("Server Response:", jqXHR.responseText);
+                    }
+                }
+            });
+        }
+
+        function databyid(id) {
+            $.get('databyid', { id }, function (rt) {
+                const std = rt.std[0];
+                $("#id").val(std.id)
+                $("#dept").val(std.dept_id) 
+                $("#name").val(std.name)
+                $("#email").val(std.email)
+                $("#phone").val(std.phone)
+                $("#age").val(std.age)
+            })
+        }
+        function register() {
+            var csrfmiddlewaretoken = document.querySelector("input[name='csrfmiddlewaretoken']").value;
+
+            var id = $("#id").val();
+            var dept = $("#dept").val();
+            var name = $("#name").val();
+            var email = $("#email").val();
+            var phone = $("#phone").val();
+            var age = $("#age").val();
+            $.ajax({
+                url: 'register',
+                type: 'POST',
+                data: { csrfmiddlewaretoken, id, dept, name, email, phone, age },
+                success: function (rt) {
+                    alert(rt.message);
+                    load();
+                    clearForm();
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    try {
+                        const errorJson = JSON.parse(jqXHR.responseText);
+                        alert("Submission Error: " + errorJson.error);
+                    } catch (e) {
+                        alert("An unrecoverable server error occurred during submission. Status: " + jqXHR.status);
+                        console.error("Server Response:", jqXHR.responseText);
+                    }
+                }
+            });
+        }
+
+        function clearForm() {
+            $("#id").val("");
+            $("#dept").val("");
+            $("#name").val("");
+            $("#email").val("");
+            $("#phone").val("");
+            $("#age").val("");
+        }
+        function checkemail(email){
+
+            $.get('checkmail',{email},function(rt){
+                if (rt == 'True'){
+                    var emailField = $('#email')
+                    emailField.css('color','red')
+                    emailField.css('border','1px solid red')
+                    $("#emailEr").html("Email already exists !!") 
+                    $("#btn").prop("disabled",true);
+                }
+                    else{
+                    $("#btn").prop("disabled",false);
+                    var emailField =$("#email")
+                    emailField.css('color','')
+                    emailField.css('border','')
+                    $("#emailEr").html("") 
+                }
+            })
+        }
+    </script>
+</head>
+
+<body>
+
+    <div class="container-fluid">
+        <div class="row mt-5">
+            <div class="col-5 card p-5">
+                <h2 align="center" style="color: #007bff;">Registration Form</h2>
+                <hr>
+                {%csrf_token%}
+                <input type="hidden" id="id">
+                <label for="dept">Department</label>
+                <select name="dept" id="dept" class="form-control">
+                    <option value="">Select Department</option>
+                    </select>
+                <label for="name">Name</label>
+                <input type="text" id="name" name="name" placeholder="Enter name" class="form-control" >
+
+                <label for="email">Email</label>
+                <input type="text" id="email" name="email" placeholder="Enter email" class="form-control" onkeyup="checkemail(value)">
+                <small id="emailEr" style="color: red;"></small> 
+
+                <label for="phone">Phone</label>
+                <input type="text" name="phone" id="phone" placeholder="Enter phone" class="form-control" >
+
+                <label for="age">Age</label>
+                <input type="text" name="age" id="age" placeholder="Enter age" class="form-control">
+                <br>
+                <button type="button" class="btn btn-success" onclick="register()" id="btn">Submit</button>
+
+            </div>
+
+            <div class="col-1"></div>
+            <div class="col-6 card p-5">
+                <h2 align="center" style="color: #007bff;">Student Details</h2>
+                <hr>
+                <input type="text" id="search" name="search" placeholder="search here...." class="form-control" onkeyup="search()">
+                <hr>
+                <table class="table">
+                    <thead class="text-white" style="background-color: #343a40;">
+                        <tr>
+                            <th>ID</th>
+                            <th>Department</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Age</th>
+                            <th colspan="2">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tdata">
+                    </tbody>
+
+                </table>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>

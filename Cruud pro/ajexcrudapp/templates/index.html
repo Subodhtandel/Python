@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+
+
+
+    <script>
+
+        $(document).ready(function () {
+            load()
+            loadDept()
+        })
+
+        function loadDept() {
+            $.get('deptdisplay', {}, function (rt) {
+                options = `<option value="">Select Department</option>`
+                rt.data.map(ele => {
+                    options += `<option value="${ele.id}">${ele.name}</option>`
+                })
+
+                $("#dept").html(options)
+            })
+        }
+
+        function load() {
+
+            $.get('display', {}, function (rt) {
+                console.log(rt.data);
+
+                rows = ""
+                rt.data.map(ele => {
+                    rows += `<tr>
+                            <td>${ele.id}</td>
+                            <td>${ele.dept__name}</td>
+                            <td>${ele.name}</td>
+                            <td>${ele.email}</td>
+                            <td>${ele.phone}</td>
+                            <td>${ele.age}</td>
+                            <td><button class='btn btn-primary' onclick='databyid(${ele.id})'>Update</button>
+                                
+                                <button class='btn btn-danger mt-1' onclick='deleteStudent(${ele.id})'>Delete</button></td>
+                            
+                        </tr>`
+                })
+
+                $("#tdata").html(rows)
+            })
+        }
+
+        function deleteStudent(id) {
+            $.get('delete', { id }, function (rt) {
+                alert(rt)
+                load()
+            })
+        }
+
+        function databyid(id) {
+            $.get('databyid', { id }, function (rt) {
+
+                $("#id").val(rt.std[0].id)
+                $("#dept").val(rt.std[0].dept_id)
+                $("#name").val(rt.std[0].name)
+                $("#email").val(rt.std[0].email)
+                $("#phone").val(rt.std[0].phone)
+                $("#age").val(rt.std[0].age)
+
+            })
+        }
+
+
+        function register() {
+
+            var csrfmiddlewaretoken = document.querySelector("input[name='csrfmiddlewaretoken']").value
+
+            var id = $("#id").val()
+            var dept = $("#dept").val()
+            var name = $("#name").val()
+            var email = $("#email").val()
+            var phone = $("#phone").val()
+            var age = $("#age").val()
+
+
+
+
+            $.post('register', { csrfmiddlewaretoken, id, dept, name, email, phone, age }, function (rt) {
+                alert(rt)
+                load()
+                $("#id").val("")
+                $("#dept").val("")
+                $("#name").val("")
+                $("#email").val("")
+                $("#phone").val("")
+                $("#age").val("")
+
+            })
+
+
+        }
+
+
+    </script>
+
+
+
+
+
+
+
+
+
+</head>
+
+<body>
+
+    <div class="container-fluid">
+        <div class="row mt-5">
+            <div class="col-5 card p-5">
+                <h2 align="center">Registration Form</h2>
+                <hr>
+                {%csrf_token%}
+                <input type="hidden" id="id">
+                <label for="dept">Department</label>
+                <select name="dept" id="dept" class="form-control">
+                    <option value="">Select Department</option>
+
+                </select>
+                <label for="name">Name</label>
+                <input type="text" id="name" name="name" placeholder="Enter name" class="form-control">
+
+                <label for="email">email</label>
+                <input type="text" id="email" name="email" placeholder="Entae email" class="form-control">
+
+                <label for="phone">Phone</label>
+                <input type="text" name="phone" id="phone" placeholder="Enter phone" class="form-control">
+
+                <label for="age">Age</label>
+                <input type="text" name="age" id="age" placeholder="Enter age" class="form-control">
+                <br>
+                <input type="submit" class="btn btn-success" onclick="register()">
+
+            </div>
+
+            <div class="col-1"></div>
+            <div class="col-6 card p-5">
+                <h2 align="center">Student Details</h2>
+                <hr>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Id</th>
+                            <th>Department</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Age</th>
+                            <th colspan="2">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tdata">
+
+                    </tbody>
+
+                </table>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>

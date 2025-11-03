@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Form</title>
+
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+    integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+    crossorigin="anonymous"></script>
+
+  <style>
+    body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: #f4f7fb;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      min-height: 100vh;
+      padding-top: 50px;
+    }
+
+    input, select {
+      width: 300px;
+      padding: 10px 14px;
+      font-size: 15px;
+      margin-bottom: 15px;
+      border: 2px solid #007bff;
+      border-radius: 8px;
+      outline: none;
+      transition: 0.3s;
+      background: white;
+    }
+
+    input:focus, select:focus {
+      border-color: #0056b3;
+      box-shadow: 0 0 6px rgba(0, 123, 255, 0.4);
+    }
+
+    hr {
+      width: 320px;
+      border: none;
+      height: 1px;
+      background: #ccc;
+      margin: 30px 0;
+    }
+
+    #tdata {
+      width: 320px;
+      background: white;
+      padding: 10px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      font-size: 15px;
+    }
+
+    ul {
+      list-style-type: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    li {
+      padding: 8px 10px;
+      border-bottom: 1px solid #eee;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    li:hover {
+      background: #e9f5ff;
+    }
+  </style>
+
+  <script>
+    $(document).ready(function () {
+      countries();
+    });
+
+    function countries() {
+      $.get('countries', {}, function (rt) {
+        options = "<option>---Select Country---</option>";
+        rt.data.map(ele => {
+          options += `<option value='${ele.id}'>${ele.name}</option>`;
+        });
+        $("#country").html(options);
+      });
+    }
+
+    function states(cid) {
+      $.get("states", { cid }, function (rt) {
+        options = "<option>---Select State---</option>";
+        rt.data.map(ele => {
+          options += `<option value='${ele.id}'>${ele.name}</option>`;
+        });
+        $("#state").html(options);
+      });
+    }
+
+    function cities(sid) {
+      $.get("cities", { sid }, function (rt) {
+        options = "<option>---Select Cities---</option>";
+        rt.data.map(ele => {
+          options += `<option value='${ele.id}'>${ele.name}</option>`;
+        });
+        $("#city").html(options);
+      });
+    }
+
+    function search() {
+      const data = document.getElementById("search").value;
+
+      $.get('/search/', { data: data }, function (rt) {
+        let row = "<ul>";
+
+        rt.data.map(ele => {
+          row += "<li>" + ele.name + "</li>";
+        });
+
+        row += "</ul>";
+
+        $("#tdata").html(row);
+      });
+    }
+  </script>
+</head>
+
+<body>
+  <input type="text" id="search" onkeyup="search()" placeholder="Type to search...">
+  <div id="tdata"></div>
+
+  <hr>
+
+  <select name="country" id="country" onchange="states(value)">
+    <option value="0">--Select Country--</option>
+  </select>
+
+  <select name="State" id="state" onchange="cities(value)">
+    <option value="0">--Select State--</option>
+  </select>
+
+  <select name="City" id="city">
+    <option value="0">--Select City--</option>
+  </select>
+</body>
+</html>

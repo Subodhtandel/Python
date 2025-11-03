@@ -1,0 +1,6 @@
+f=open("newflie,txt","w")
+f.write("Hello\n")
+f.write("This is Line.")
+f.write("This is secound line.")
+f.close()
+print("Done.")
