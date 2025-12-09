@@ -1,0 +1,55 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor List</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>Medical Professionals Directory</h1>
+            <p class="subtitle">Find and connect with expert doctors</p>
+        </header>
+
+        <div class="search-section">
+            <input type="text" placeholder="Search doctors by name or specialization..." class="search-box">
+        </div>
+
+        <div class="doctors-grid">
+            {% if doctors %}
+                {% for doctor in doctors %}
+                    <div class="doctor-card">
+                        <div class="card-header">
+                            <div class="avatar-small">{{ doctor.name|first }}</div>
+                            <div class="card-title">
+                                <h3>{{ doctor.name }}</h3>
+                                <p class="specialty">{{ doctor.specialization }}</p>
+                            </div>
+                        </div>
+
+                        <div class="card-body">
+                            <div class="card-info">
+                                <span class="badge">{{ doctor.experience }}+ years</span>
+                                <div class="rating-small">
+                                    <span class="stars-small">★★★★★</span>
+                                    <span>({{ doctor.rating }})</span>
+                                </div>
+                            </div>
+                            <p class="location">📍 {{ doctor.location }}</p>
+                        </div>
+
+                        <div class="card-footer">
+                            <a href="{% url 'doctor_detail' doctor.pk %}" class="btn btn-small">View Profile</a>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p class="no-doctors">No doctors found.</p>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

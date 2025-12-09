@@ -1,0 +1,87 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Profile</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>Doctor Profile</h1>
+            <p class="subtitle">Professional Healthcare Services</p>
+        </header>
+
+        <div class="profile-card">
+            <div class="profile-header">
+                <div class="profile-avatar">{{ doctor.name }}</div>
+                <div class="profile-info-header">
+                    <h2 class="doctor-name">{{ doctor.name }}</h2>
+                    <p class="specialization">{{ doctor.specialization }}</p>
+                </div>
+            </div>
+
+            <div class="profile-body">
+                <div class="info-section">
+                    <h3>Professional Information</h3>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <label>Years of Experience:</label>
+                            <p>{{ doctor.experience }} years</p>
+                        </div>
+                        <div class="info-item">
+                            <label>Rating:</label>
+                            <div class="rating">
+                                <span class="stars">★ ★ ★ ★ ★</span>
+                                <span class="rating-value">{{ doctor.rating }}/5.0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-section">
+                    <h3>Contact Information</h3>
+                    <div class="contact-info">
+                        <div class="contact-item">
+                            <span class="icon">📧</span>
+                            <div>
+                                <label>Email:</label>
+                                <p><a href="mailto:{{ doctor.email }}">{{ doctor.email }}</a></p>
+                            </div>
+                        </div>
+                        <div class="contact-item">
+                            <span class="icon">📱</span>
+                            <div>
+                                <label>Phone:</label>
+                                <p><a href="tel:{{ doctor.phone }}">{{ doctor.phone }}</a></p>
+                            </div>
+                        </div>
+                        <div class="contact-item">
+                            <span class="icon">📍</span>
+                            <div>
+                                <label>Location:</label>
+                                <p>{{ doctor.location }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-section">
+                    <h3>About</h3>
+                    <div class="bio">
+                        <p>{{ doctor.bio }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="profile-footer">
+                <button class="btn btn-primary">Book Appointment</button>
+                <button class="btn btn-secondary">Request Consultation</button>
+                <a href="{% url 'doctor_list' %}" class="btn btn-outline">Back to List</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

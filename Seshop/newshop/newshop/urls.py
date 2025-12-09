@@ -5,13 +5,12 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path("", include("cars10.urls"))
+    # This line connects all the URLs from your cars10/urls.py file
+    path("", include("cars10.urls")),
+    path('accounts/', include('django.contrib.auth.urls')), 
 ]
 
 if settings.DEBUG:
-
-    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-    from django.contrib.staticfiles.views import serve
-    urlpatterns += [
-        path(settings.STATIC_URL + '<path:path>', serve),
-    ]
+   if settings.DEBUG:
+    urlpatterns.extend(static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT))
+    urlpatterns.extend(static(settings.STATIC_URL, document_root=settings.STATIC_ROOT))
