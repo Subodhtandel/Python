@@ -1,0 +1,19 @@
+{% extends "myapp/base.html" %}
+
+{% block title %}Cancel Appointment - Doctor Management System{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <h1>Cancel Appointment</h1>
+    <a href="{% url 'appointment-list' %}" class="btn btn-secondary">Back</a>
+</div>
+
+<div class="card">
+    <p>Are you sure you want to cancel the appointment for <strong>{{ appointment.patient_name }}</strong> with Dr. {{ appointment.doctor.get_full_name }}?</p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Yes, Cancel</button>
+        <a href="{% url 'appointment-detail' appointment.pk %}" class="btn btn-secondary">Keep</a>
+    </form>
+</div>
+{% endblock %}

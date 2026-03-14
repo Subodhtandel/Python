@@ -1,4 +1,4 @@
-n = 5  # Change this for bigger diamonds
+n = 5
 
 # Upper half
 for i in range(n):
@@ -20,4 +20,4 @@ for i in range(n - 2, -1, -1):
             print("*", end="")
         else:
             print(" ", end="")
-    print()
+    print(

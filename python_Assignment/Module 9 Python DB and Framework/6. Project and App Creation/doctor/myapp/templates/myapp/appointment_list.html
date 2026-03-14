@@ -1,0 +1,73 @@
+{% extends "myapp/base.html" %}
+
+{% block title %}Appointments - Doctor Management System{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <h1>Appointments</h1>
+    <a href="{% url 'appointment-create' %}" class="btn btn-success">+ Schedule Appointment</a>
+</div>
+
+<div class="card">
+    <h3>Filter Appointments</h3>
+    <form method="get" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem;">
+        <div>
+            <label for="doctor">Doctor:</label>
+            <select name="doctor" id="doctor">
+                <option value="">All Doctors</option>
+                {% for d in doctors %}
+                    <option value="{{ d.pk }}" {% if d.pk|stringformat:"s" == selected_doctor %}selected{% endif %}>Dr. {{ d.get_full_name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div>
+            <label for="status">Status:</label>
+            <select name="status" id="status">
+                <option value="">All Statuses</option>
+                {% for code, name in statuses %}
+                    <option value="{{ code }}" {% if code == selected_status %}selected{% endif %}>{{ name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div style="display: flex; align-items: flex-end; gap: 0.5rem;">
+            <button type="submit" class="btn btn-primary" style="width: 100%;">Filter</button>
+            <a href="{% url 'appointment-list' %}" class="btn btn-secondary" style="width: 100%;">Reset</a>
+        </div>
+    </form>
+</div>
+
+{% if appointments %}
+<div class="card">
+    <table>
+        <thead>
+            <tr>
+                <th>Patient</th>
+                <th>Doctor</th>
+                <th>Date & Time</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for appointment in appointments %}
+                <tr>
+                    <td>{{ appointment.patient_name }}</td>
+                    <td>Dr. {{ appointment.doctor.get_full_name }}</td>
+                    <td>{{ appointment.appointment_date|date:"M d, Y H:i" }}</td>
+                    <td>{{ appointment.get_status_display }}</td>
+                    <td>
+                        <a href="{% url 'appointment-detail' appointment.pk %}" class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.9rem;">View</a>
+                        <a href="{% url 'appointment-update' appointment.pk %}" class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.9rem;">Edit</a>
+                        <a href="{% url 'appointment-delete' appointment.pk %}" class="btn btn-danger" style="padding: 0.5rem 1rem; font-size: 0.9rem;">Cancel</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="card">
+    <p style="text-align: center; color: #718096;">No appointments found. <a href="{% url 'appointment-create' %}">Schedule one now</a>.</p>
+</div>
+{% endif %}
+{% endblock %}

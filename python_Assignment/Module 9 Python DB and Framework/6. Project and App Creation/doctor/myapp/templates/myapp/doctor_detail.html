@@ -1,0 +1,88 @@
+{% extends "myapp/base.html" %}
+
+{% block title %}Dr. {{ doctor.get_full_name }} - Doctor Management System{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <h1>Dr. {{ doctor.get_full_name }}</h1>
+    <div>
+        <a href="{% url 'doctor-update' doctor.pk %}" class="btn btn-secondary">Edit</a>
+        <a href="{% url 'doctor-list' %}" class="btn btn-secondary">Back</a>
+    </div>
+</div>
+
+<div class="card">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+        <div>
+            <h3>Personal Information</h3>
+            <p><strong>Full Name:</strong> Dr. {{ doctor.get_full_name }}</p>
+            <p><strong>Email:</strong> <a href="mailto:{{ doctor.email }}">{{ doctor.email }}</a></p>
+            <p><strong>Phone:</strong> <a href="tel:{{ doctor.phone }}">{{ doctor.phone }}</a></p>
+            <p><strong>License Number:</strong> {{ doctor.license_number }}</p>
+        </div>
+        
+        <div>
+            <h3>Professional Details</h3>
+            <p><strong>Specialization:</strong> {{ doctor.get_specialization_display }}</p>
+            <p><strong>Experience:</strong> {{ doctor.experience_years }} years</p>
+            <p><strong>Status:</strong> 
+                {% if doctor.is_available %}
+                    <span style="background: #c6f6d5; color: #22543d; padding: 0.25rem 0.75rem; border-radius: 4px;">Available</span>
+                {% else %}
+                    <span style="background: #fed7d7; color: #742a2a; padding: 0.25rem 0.75rem; border-radius: 4px;">Unavailable</span>
+                {% endif %}
+            </p>
+            <p><strong>Member Since:</strong> {{ doctor.created_at|date:"F d, Y" }}</p>
+        </div>
+    </div>
+</div>
+
+{% if appointments %}
+<div class="card">
+    <h2>Recent Appointments</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Patient</th>
+                <th>Date & Time</th>
+                <th>Status</th>
+                <th>Reason</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for appointment in appointments %}
+                <tr>
+                    <td>{{ appointment.patient_name }}</td>
+                    <td>{{ appointment.appointment_date|date:"M d, Y H:i" }}</td>
+                    <td>
+                        {% if appointment.status == 'completed' %}
+                            <span style="background: #c6f6d5; color: #22543d; padding: 0.25rem 0.75rem; border-radius: 4px;">Completed</span>
+                        {% elif appointment.status == 'scheduled' %}
+                            <span style="background: #bee3f8; color: #2c5282; padding: 0.25rem 0.75rem; border-radius: 4px;">Scheduled</span>
+                        {% elif appointment.status == 'cancelled' %}
+                            <span style="background: #fed7d7; color: #742a2a; padding: 0.25rem 0.75rem; border-radius: 4px;">Cancelled</span>
+                        {% else %}
+                            <span style="background: #fed7d7; color: #742a2a; padding: 0.25rem 0.75rem; border-radius: 4px;">No Show</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ appointment.reason|truncatewords:5 }}</td>
+                    <td>
+                        <a href="{% url 'appointment-detail' appointment.pk %}" class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.9rem;">View</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <a href="{% url 'appointment-list' %}?doctor={{ doctor.pk }}" style="display: inline-block; margin-top: 1rem;">View all appointments →</a>
+</div>
+{% endif %}
+
+<div class="card">
+    <div style="display: flex; gap: 1rem;">
+        <a href="{% url 'appointment-create' %}" class="btn btn-success">Schedule New Appointment</a>
+        <a href="{% url 'doctor-update' doctor.pk %}" class="btn btn-secondary">Edit Doctor</a>
+        <a href="{% url 'doctor-delete' doctor.pk %}" class="btn btn-danger">Delete Doctor</a>
+    </div>
+</div>
+{% endblock %}

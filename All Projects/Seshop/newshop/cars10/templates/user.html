@@ -1,0 +1,295 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Feane</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.css' %}" />
+    <link href="{% static 'css/font-awesome.min.css' %}" rel="stylesheet" />
+    <link href="{% static 'css/style.css' %}" rel="stylesheet" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #dfe361 0%, #b0b518 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Poppins', sans-serif;
+            padding: 20px;
+        }
+        
+        .login-wrapper {
+            display: flex;
+            width: 100%;
+            max-width: 900px;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        
+        .login-left {
+            flex: 1;
+            background: linear-gradient(135deg, #e3ea66 0%, #b79416 100%);
+            padding: 60px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            text-align: center;
+        }
+        
+        .login-left h2 {
+            font-size: 36px;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+        
+        .login-left p {
+            font-size: 16px;
+            line-height: 1.6;
+            opacity: 0.9;
+            margin-bottom: 30px;
+        }
+        
+        .login-right {
+            flex: 1;
+            padding: 60px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .login-right h3 {
+            font-size: 28px;
+            margin-bottom: 30px;
+            color: #333;
+            font-weight: 600;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 10px;
+            color: #555;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #144ba5;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .form-group input::placeholder {
+            color: #bbb;
+        }
+        
+        .form-remember {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+            font-size: 14px;
+        }
+        
+        .form-remember input {
+            width: auto;
+            margin-right: 8px;
+            cursor: pointer;
+        }
+        
+        .form-remember label {
+            margin: 0;
+            cursor: pointer;
+            color: #666;
+        }
+        
+        .forgot-password {
+            text-align: right;
+            font-size: 13px;
+        }
+        
+        .forgot-password a {
+            color: #667eea;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .forgot-password a:hover {
+            color: #764ba2;
+            text-decoration: underline;
+        }
+        
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #eaea66 0%, #d8a122 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+        
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .login-btn:active {
+            transform: translateY(0);
+        }
+        
+        .signup-section {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .signup-section p {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 0;
+        }
+        
+        .signup-section a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+        
+        .signup-section a:hover {
+            color: #764ba2;
+        }
+        
+        .alert {
+            margin-bottom: 20px;
+            padding: 12px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        @media (max-width: 768px) {
+            .login-wrapper {
+                flex-direction: column;
+            }
+            
+            .login-left {
+                padding: 40px 30px;
+            }
+            
+            .login-right {
+                padding: 40px 30px;
+            }
+            
+            .login-left h2 {
+                font-size: 28px;
+            }
+            
+            .login-right h3 {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-wrapper">
+        <!-- Left Side - Brand Info -->
+        <div class="login-left">
+            <h2>Feane</h2>
+            <p>Welcome back to your favorite restaurant! Login to explore delicious dishes, book tables, and enjoy exclusive offers.</p>
+            <i class="fa fa-utensils" style="font-size: 60px; margin-top: 20px;"></i>
+        </div>
+        
+        <!-- Right Side - Login Form -->
+        <div class="login-right">
+            <h3>Login</h3>
+            
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+            
+            <form method="POST" action="{% url 'login' %}">
+                {% csrf_token %}
+
+            
+                
+                <div class="form-group">
+                    <label for="identifier">Email or Phone Number</label>
+                    <input type="text" id="identifier" name="identifier" placeholder="Enter your email or phone number" value="{{ request.POST.identifier }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="otp">One-Time Password (OTP)</label>
+                    <input type="text" id="otp" name="otp" placeholder="Enter OTP (if received)" {% if not otp_sent %}disabled{% endif %}>
+                </div>
+                
+                <div class="form-remember">
+                    <input type="checkbox" id="remember" name="remember" {% if request.POST.remember %}checked{% endif %}>
+                    <label for="remember">Remember me</label>
+                    <div class="forgot-password" style="margin-left: auto;">
+                        <a href="#">Forgot password?</a>
+                    </div>
+                </div>
+                
+                {% if otp_sent %}
+                    <button type="submit" class="login-btn">Verify & Login</button>
+                {% else %}
+                    <button type="submit" class="login-btn">Send OTP</button>
+                {% endif %}
+            </form>
+            
+            <div class="signup-section">
+                <p>Don't have an account? <a href="{% url 'signup' %}">Sign up here</a></p>
+            </div>
+            {% if debug_otp %}
+                <div class="alert alert-success" style="margin-top:10px;">Debug OTP (for testing): <strong>{{ debug_otp }}</strong></div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <script src="{% static 'js/bootstrap.js' %}"></script>
+</body>
+</html>

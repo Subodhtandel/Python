@@ -1,0 +1,309 @@
+{% extends 'myapp/base.html' %}
+
+{% block title %}Patient Registration{% endblock %}
+
+{% block extra_css %}
+<style>
+    .registration-form {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .error-message {
+        color: #e53e3e;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+        display: none;
+    }
+    
+    .error-message.show {
+        display: block;
+    }
+    
+    input.invalid {
+        border-color: #e53e3e;
+        box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.1);
+    }
+    
+    input.valid {
+        border-color: #48bb78;
+        box-shadow: 0 0 0 3px rgba(72, 187, 120, 0.1);
+    }
+    
+    .validation-icon {
+        display: inline-block;
+        margin-left: 0.5rem;
+        font-size: 1.2rem;
+    }
+    
+    .validation-icon.valid {
+        color: #48bb78;
+    }
+    
+    .validation-icon.invalid {
+        color: #e53e3e;
+    }
+    
+    .form-help-text {
+        font-size: 0.875rem;
+        color: #718096;
+        margin-top: 0.25rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="card registration-form">
+    <h1 style="margin-bottom: 1.5rem; text-align: center; color: #667eea;">Patient Registration</h1>
+    <p style="text-align: center; color: #718096; margin-bottom: 2rem;">
+        Please fill in all the required information. Email and phone number will be validated in real-time.
+    </p>
+    
+    <form method="post" id="registrationForm" novalidate>
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="{{ form.first_name.id_for_label }}">First Name <span style="color: #e53e3e;">*</span></label>
+            {{ form.first_name }}
+            <div class="error-message" id="first_name_error"></div>
+        </div>
+        
+        <div class="form-group">
+            <label for="{{ form.last_name.id_for_label }}">Last Name <span style="color: #e53e3e;">*</span></label>
+            {{ form.last_name }}
+            <div class="error-message" id="last_name_error"></div>
+        </div>
+        
+        <div class="form-group">
+            <label for="{{ form.email.id_for_label }}">Email Address <span style="color: #e53e3e;">*</span></label>
+            {{ form.email }}
+            <div class="form-help-text">Example: user@example.com</div>
+            <div class="error-message" id="email_error"></div>
+            <span class="validation-icon" id="email_icon"></span>
+        </div>
+        
+        <div class="form-group">
+            <label for="{{ form.phone.id_for_label }}">Phone Number <span style="color: #e53e3e;">*</span></label>
+            {{ form.phone }}
+            <div class="form-help-text">Format: +1234567890 or 123-456-7890 (minimum 10 digits)</div>
+            <div class="error-message" id="phone_error"></div>
+            <span class="validation-icon" id="phone_icon"></span>
+        </div>
+        
+        <div class="form-group">
+            <label for="{{ form.date_of_birth.id_for_label }}">Date of Birth <span style="color: #e53e3e;">*</span></label>
+            {{ form.date_of_birth }}
+            <div class="error-message" id="date_of_birth_error"></div>
+        </div>
+        
+        <div class="form-group">
+            <label for="{{ form.address.id_for_label }}">Address <span style="color: #e53e3e;">*</span></label>
+            {{ form.address }}
+            <div class="error-message" id="address_error"></div>
+        </div>
+        
+        {% if form.errors %}
+            <div class="alert alert-error">
+                <strong>Please correct the following errors:</strong>
+                <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
+                    {% for field, errors in form.errors.items %}
+                        {% for error in errors %}
+                            <li>{{ field|title }}: {{ error }}</li>
+                        {% endfor %}
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+        
+        <div style="text-align: center; margin-top: 2rem;">
+            <button type="submit" class="btn btn-primary" id="submitBtn" style="padding: 0.75rem 3rem; font-size: 1.1rem;">
+                Register
+            </button>
+            <a href="{% url 'home' %}" class="btn btn-secondary" style="margin-left: 1rem;">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<script>
+    // Email validation function
+    function validateEmail(email) {
+        // RFC 5322 compliant email regex (simplified version)
+        const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+        return emailRegex.test(email);
+    }
+    
+    // Phone number validation function
+    function validatePhone(phone) {
+        // Remove common formatting characters
+        const cleaned = phone.replace(/[\s\-\(\)\+]/g, '');
+        // Check if it contains only digits and has at least 10 digits
+        return /^\d{10,15}$/.test(cleaned);
+    }
+    
+    // Display error message
+    function showError(fieldId, errorId, message) {
+        const field = document.getElementById(fieldId);
+        const errorDiv = document.getElementById(errorId);
+        const icon = document.getElementById(fieldId.replace('id_', '') + '_icon');
+        
+        field.classList.remove('valid');
+        field.classList.add('invalid');
+        errorDiv.textContent = message;
+        errorDiv.classList.add('show');
+        
+        if (icon) {
+            icon.textContent = '❌';
+            icon.classList.remove('valid');
+            icon.classList.add('invalid');
+        }
+    }
+    
+    // Display success state
+    function showSuccess(fieldId) {
+        const field = document.getElementById(fieldId);
+        const errorDiv = document.getElementById(fieldId.replace('id_', '') + '_error');
+        const icon = document.getElementById(fieldId.replace('id_', '') + '_icon');
+        
+        field.classList.remove('invalid');
+        field.classList.add('valid');
+        errorDiv.classList.remove('show');
+        
+        if (icon) {
+            icon.textContent = '✓';
+            icon.classList.remove('invalid');
+            icon.classList.add('valid');
+        }
+    }
+    
+    // Clear validation state
+    function clearValidation(fieldId) {
+        const field = document.getElementById(fieldId);
+        const errorDiv = document.getElementById(fieldId.replace('id_', '') + '_error');
+        const icon = document.getElementById(fieldId.replace('id_', '') + '_icon');
+        
+        field.classList.remove('invalid', 'valid');
+        errorDiv.classList.remove('show');
+        
+        if (icon) {
+            icon.textContent = '';
+            icon.classList.remove('invalid', 'valid');
+        }
+    }
+    
+    // Real-time email validation
+    const emailField = document.getElementById('id_email');
+    if (emailField) {
+        emailField.addEventListener('blur', function() {
+            const email = this.value.trim();
+            if (email === '') {
+                showError('id_email', 'email_error', 'Email address is required.');
+            } else if (!validateEmail(email)) {
+                showError('id_email', 'email_error', 'Please enter a valid email address (e.g., user@example.com).');
+            } else {
+                showSuccess('id_email');
+            }
+        });
+        
+        emailField.addEventListener('input', function() {
+            const email = this.value.trim();
+            if (email === '') {
+                clearValidation('id_email');
+            } else if (validateEmail(email)) {
+                showSuccess('id_email');
+            }
+        });
+    }
+    
+    // Real-time phone validation
+    const phoneField = document.getElementById('id_phone');
+    if (phoneField) {
+        phoneField.addEventListener('blur', function() {
+            const phone = this.value.trim();
+            if (phone === '') {
+                showError('id_phone', 'phone_error', 'Phone number is required.');
+            } else if (!validatePhone(phone)) {
+                showError('id_phone', 'phone_error', 'Please enter a valid phone number (minimum 10 digits). Formats: +1234567890 or 123-456-7890');
+            } else {
+                showSuccess('id_phone');
+            }
+        });
+        
+        phoneField.addEventListener('input', function() {
+            const phone = this.value.trim();
+            if (phone === '') {
+                clearValidation('id_phone');
+            } else if (validatePhone(phone)) {
+                showSuccess('id_phone');
+            }
+        });
+    }
+    
+    // Form submission validation
+    const registrationForm = document.getElementById('registrationForm');
+    if (registrationForm) {
+        registrationForm.addEventListener('submit', function(e) {
+            let isValid = true;
+            
+            // Validate email
+            const email = emailField.value.trim();
+            if (email === '') {
+                showError('id_email', 'email_error', 'Email address is required.');
+                isValid = false;
+            } else if (!validateEmail(email)) {
+                showError('id_email', 'email_error', 'Please enter a valid email address.');
+                isValid = false;
+            }
+            
+            // Validate phone
+            const phone = phoneField.value.trim();
+            if (phone === '') {
+                showError('id_phone', 'phone_error', 'Phone number is required.');
+                isValid = false;
+            } else if (!validatePhone(phone)) {
+                showError('id_phone', 'phone_error', 'Please enter a valid phone number (minimum 10 digits).');
+                isValid = false;
+            }
+            
+            // Validate other required fields
+            const firstName = document.getElementById('id_first_name').value.trim();
+            if (firstName === '') {
+                showError('id_first_name', 'first_name_error', 'First name is required.');
+                isValid = false;
+            }
+            
+            const lastName = document.getElementById('id_last_name').value.trim();
+            if (lastName === '') {
+                showError('id_last_name', 'last_name_error', 'Last name is required.');
+                isValid = false;
+            }
+            
+            const dateOfBirth = document.getElementById('id_date_of_birth').value;
+            if (dateOfBirth === '') {
+                showError('id_date_of_birth', 'date_of_birth_error', 'Date of birth is required.');
+                isValid = false;
+            }
+            
+            const address = document.getElementById('id_address').value.trim();
+            if (address === '') {
+                showError('id_address', 'address_error', 'Address is required.');
+                isValid = false;
+            }
+            
+            if (!isValid) {
+                e.preventDefault();
+                // Scroll to first error
+                const firstError = registrationForm.querySelector('.invalid');
+                if (firstError) {
+                    firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    firstError.focus();
+                }
+            }
+        });
+    }
+</script>
+{% endblock %}
+

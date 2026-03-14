@@ -1,0 +1,47 @@
+{% extends "myapp/base.html" %}
+
+{% block title %}Home - Doctor Management System{% endblock %}
+
+{% block content %}
+<h1 style="margin-bottom: 2rem;">Welcome to Doctor Management System</h1>
+
+<div class="stats">
+    <div class="stat-card">
+        <div class="stat-number">{{ total_doctors }}</div>
+        <div class="stat-label">Total Doctors</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number">{{ available_doctors }}</div>
+        <div class="stat-label">Available Doctors</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number">{{ total_appointments }}</div>
+        <div class="stat-label">Total Appointments</div>
+    </div>
+</div>
+
+<div class="card">
+    <h2>Quick Actions</h2>
+    <p style="margin: 1rem 0;">Get started by managing doctors and appointments:</p>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1.5rem;">
+        <a href="{% url 'doctor-list' %}" class="btn btn-primary">View All Doctors</a>
+        <a href="{% url 'doctor-create' %}" class="btn btn-success">Add New Doctor</a>
+        <a href="{% url 'appointment-list' %}" class="btn btn-primary">View Appointments</a>
+        <a href="{% url 'appointment-create' %}" class="btn btn-success">Schedule Appointment</a>
+        <a href="{% url 'statistics' %}" class="btn btn-secondary">View Statistics</a>
+        <a href="{% url 'admin:index' %}" class="btn btn-secondary">Admin Panel</a>
+    </div>
+</div>
+
+<div class="card">
+    <h2>About This System</h2>
+    <p>This Doctor Management System allows you to:</p>
+    <ul style="margin-left: 2rem; margin-top: 1rem;">
+        <li>Manage doctor profiles and information</li>
+        <li>Track doctor specializations and availability</li>
+        <li>Schedule and manage appointments</li>
+        <li>View statistics and reports</li>
+        <li>Manage the system through Django Admin interface</li>
+    </ul>
+</div>
+{% endblock %}

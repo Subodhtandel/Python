@@ -1,0 +1,82 @@
+{% extends "myapp/base.html" %}
+
+{% block title %}Doctors - Doctor Management System{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <h1>Doctors</h1>
+    <a href="{% url 'doctor-create' %}" class="btn btn-success">+ Add New Doctor</a>
+</div>
+
+<div class="card">
+    <h3>Filter Doctors</h3>
+    <form method="get" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem;">
+        <div>
+            <label for="specialization">Specialization:</label>
+            <select name="specialization" id="specialization">
+                <option value="">All Specializations</option>
+                {% for code, name in specializations %}
+                    <option value="{{ code }}" {% if code == selected_specialization %}selected{% endif %}>{{ name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div>
+            <label for="availability">Availability:</label>
+            <select name="availability" id="availability">
+                <option value="">All Doctors</option>
+                <option value="available">Available Only</option>
+                <option value="unavailable">Unavailable Only</option>
+            </select>
+        </div>
+        <div style="display: flex; align-items: flex-end; gap: 0.5rem;">
+            <button type="submit" class="btn btn-primary" style="width: 100%;">Filter</button>
+            <a href="{% url 'doctor-list' %}" class="btn btn-secondary" style="width: 100%;">Reset</a>
+        </div>
+    </form>
+</div>
+
+{% if doctors %}
+<div class="card">
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Specialization</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Experience</th>
+                <th>Availability</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for doctor in doctors %}
+                <tr>
+                    <td><strong>Dr. {{ doctor.get_full_name }}</strong></td>
+                    <td>{{ doctor.get_specialization_display }}</td>
+                    <td>{{ doctor.email }}</td>
+                    <td>{{ doctor.phone }}</td>
+                    <td>{{ doctor.experience_years }} years</td>
+                    <td>
+                        {% if doctor.is_available %}
+                            <span style="background: #c6f6d5; color: #22543d; padding: 0.25rem 0.75rem; border-radius: 4px;">Available</span>
+                        {% else %}
+                            <span style="background: #fed7d7; color: #742a2a; padding: 0.25rem 0.75rem; border-radius: 4px;">Unavailable</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{% url 'doctor-detail' doctor.pk %}" class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.9rem;">View</a>
+                        <a href="{% url 'doctor-update' doctor.pk %}" class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.9rem;">Edit</a>
+                        <a href="{% url 'doctor-delete' doctor.pk %}" class="btn btn-danger" style="padding: 0.5rem 1rem; font-size: 0.9rem;">Delete</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="card">
+    <p style="text-align: center; color: #718096;">No doctors found. <a href="{% url 'doctor-create' %}">Create one now</a>.</p>
+</div>
+{% endif %}
+{% endblock %}

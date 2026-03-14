@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - User Authentication{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card mt-5">
+            <div class="card-body text-center p-5">
+                <h1 class="display-4 mb-4">
+                    <i class="bi bi-shield-lock text-primary"></i>
+                    Welcome to User Authentication System
+                </h1>
+                <p class="lead mb-4">
+                    A complete Django authentication system with user signup, login, password reset, and profile management.
+                </p>
+                {% if user.is_authenticated %}
+                    <div class="alert alert-success">
+                        <h5>Hello, {{ user.username }}!</h5>
+                        <p>You are logged in. Visit your profile to update your information.</p>
+                    </div>
+                    <a href="{% url 'profile' %}" class="btn btn-primary btn-lg me-2">
+                        <i class="bi bi-person-circle"></i> View Profile
+                    </a>
+                {% else %}
+                    <div class="d-grid gap-2 d-md-block">
+                        <a href="{% url 'signup' %}" class="btn btn-primary btn-lg me-2">
+                            <i class="bi bi-person-plus"></i> Sign Up
+                        </a>
+                        <a href="{% url 'login' %}" class="btn btn-outline-primary btn-lg">
+                            <i class="bi bi-box-arrow-in-right"></i> Login
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-md-4 mb-3">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="bi bi-person-plus display-4 text-primary mb-3"></i>
+                        <h5>User Signup</h5>
+                        <p>Create a new account with email verification</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="bi bi-key display-4 text-primary mb-3"></i>
+                        <h5>Password Reset</h5>
+                        <p>Secure password recovery via email</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="bi bi-person-circle display-4 text-primary mb-3"></i>
+                        <h5>Profile Management</h5>
+                        <p>Update your profile and personal information</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+

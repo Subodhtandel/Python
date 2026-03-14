@@ -1,0 +1,28 @@
+{% extends "myapp/base.html" %}
+
+{% block title %}Appointment - {{ appointment.patient_name }}{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <h1>Appointment Details</h1>
+    <div>
+        <a href="{% url 'appointment-update' appointment.pk %}" class="btn btn-secondary">Edit</a>
+        <a href="{% url 'appointment-list' %}" class="btn btn-secondary">Back</a>
+    </div>
+</div>
+
+<div class="card">
+    <h3>Patient Information</h3>
+    <p><strong>Name:</strong> {{ appointment.patient_name }}</p>
+    <p><strong>Email:</strong> <a href="mailto:{{ appointment.patient_email }}">{{ appointment.patient_email }}</a></p>
+    <p><strong>Doctor:</strong> Dr. {{ appointment.doctor.get_full_name }}</p>
+    <p><strong>Date & Time:</strong> {{ appointment.appointment_date|date:"F d, Y H:i" }}</p>
+    <p><strong>Status:</strong> {{ appointment.get_status_display }}</p>
+    <p><strong>Reason:</strong> {{ appointment.reason }}</p>
+
+    {% if appointment.notes %}
+        <h4>Notes</h4>
+        <p>{{ appointment.notes }}</p>
+    {% endif %}
+</div>
+{% endblock %}

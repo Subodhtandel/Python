@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block title %}Appointment Confirmed - Doctor Finder{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-success text-white text-center">
+                <h3><i class="bi bi-check-circle"></i> Appointment Confirmed!</h3>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-4">
+                    <div class="mb-3">
+                        <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
+                    </div>
+                    <h4>Your appointment has been successfully booked!</h4>
+                    <p class="text-muted">Payment received and appointment confirmed.</p>
+                </div>
+
+                <div class="card bg-light mb-4">
+                    <div class="card-body">
+                        <h5><i class="bi bi-file-earmark-text"></i> Appointment Details</h5>
+                        <hr>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Appointment ID:</strong><br>{{ appointment.order_id }}</p>
+                                <p><strong>Doctor:</strong><br>Dr. {{ appointment.doctor.get_full_name }}</p>
+                                <p><strong>Specialty:</strong><br>{{ appointment.doctor.get_specialties_display }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Patient Name:</strong><br>{{ appointment.patient_name }}</p>
+                                <p><strong>Date:</strong><br>{{ appointment.appointment_date }}</p>
+                                <p><strong>Time:</strong><br>{{ appointment.appointment_time }}</p>
+                            </div>
+                        </div>
+                        <hr>
+                        <p><strong>Amount Paid:</strong> <span class="text-success fs-5">₹{{ appointment.amount }}</span></p>
+                        <p><strong>Payment Status:</strong> 
+                            <span class="badge bg-success">{{ appointment.payment_status|title }}</span>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="card bg-light mb-4">
+                    <div class="card-body">
+                        <h5><i class="bi bi-geo-alt"></i> Doctor's Address</h5>
+                        <p>{{ appointment.doctor.address }}<br>
+                        {{ appointment.doctor.city }}, {{ appointment.doctor.state }} {{ appointment.doctor.zip_code }}</p>
+                        <p><strong>Contact:</strong> {{ appointment.doctor.phone }}</p>
+                    </div>
+                </div>
+
+                {% if appointment.symptoms %}
+                <div class="card bg-light mb-4">
+                    <div class="card-body">
+                        <h5><i class="bi bi-clipboard-pulse"></i> Symptoms</h5>
+                        <p>{{ appointment.symptoms }}</p>
+                    </div>
+                </div>
+                {% endif %}
+
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i> 
+                    <strong>Important:</strong> 
+                    <ul class="mb-0 mt-2">
+                        <li>Please arrive 10 minutes before your appointment time</li>
+                        <li>Bring a valid ID proof</li>
+                        <li>Carry your previous medical reports if any</li>
+                        <li>You will receive a confirmation email shortly</li>
+                    </ul>
+                </div>
+
+                <div class="text-center">
+                    <a href="{% url 'home' %}" class="btn btn-primary">
+                        <i class="bi bi-house"></i> Back to Home
+                    </a>
+                    <a href="{% url 'doctor_list' %}" class="btn btn-outline-primary">
+                        <i class="bi bi-search"></i> Find More Doctors
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+

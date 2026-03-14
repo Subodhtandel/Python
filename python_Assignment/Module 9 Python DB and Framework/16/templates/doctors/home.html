@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - Doctor Finder{% endblock %}
+
+{% block content %}
+<div class="hero-section text-center py-5 mb-5" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 15px; color: white;">
+    <div class="container">
+        <h1 class="display-4 mb-3"><i class="bi bi-hospital"></i> Find Your Perfect Doctor</h1>
+        <p class="lead">Book appointments online with verified doctors and specialists</p>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-search"></i> Search Doctors</h5>
+                <form method="get" action="{% url 'doctor_list' %}">
+                    <div class="row">
+                        <div class="col-md-5">
+                            {{ form.specialty }}
+                        </div>
+                        <div class="col-md-5">
+                            {{ form.city }}
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="bi bi-search"></i> Search
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-12">
+        <h3><i class="bi bi-list-ul"></i> Popular Specialties</h3>
+    </div>
+    {% for specialty in specialties %}
+    <div class="col-md-3 mb-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <h2>{{ specialty.icon }}</h2>
+                <h5 class="card-title">{{ specialty.name }}</h5>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <h3><i class="bi bi-star"></i> Featured Doctors</h3>
+    </div>
+    {% for doctor in doctors %}
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="text-center mb-3">
+                    {% if doctor.profile_picture %}
+                        <img src="{{ doctor.profile_picture.url }}" alt="Doctor" class="rounded-circle" width="100" height="100" style="object-fit: cover;">
+                    {% else %}
+                        <div class="rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center" style="width: 100px; height: 100px; font-size: 2rem;">
+                            👨‍⚕️
+                        </div>
+                    {% endif %}
+                </div>
+                <h5 class="card-title text-center">Dr. {{ doctor.get_full_name }}</h5>
+                <p class="text-center text-muted">
+                    {% for specialty in doctor.specialties.all %}
+                        <span class="specialty-badge">{{ specialty.name }}</span>
+                    {% endfor %}
+                </p>
+                <p class="text-center">
+                    <span class="rating-stars">
+                        {% for i in "12345"|make_list %}
+                            {% if forloop.counter <= doctor.rating|add:"0"|floatformat:0|add:"0" %}
+                                ★
+                            {% else %}
+                                ☆
+                            {% endif %}
+                        {% endfor %}
+                    </span>
+                    <strong>{{ doctor.rating }}</strong>
+                </p>
+                <p class="text-center">
+                    <i class="bi bi-geo-alt"></i> {{ doctor.city }}, {{ doctor.state }}
+                </p>
+                <p class="text-center">
+                    <strong>Fee: ₹{{ doctor.consultation_fee }}</strong>
+                </p>
+                <div class="text-center">
+                    <a href="{% url 'doctor_detail' doctor.id %}" class="btn btn-primary">
+                        <i class="bi bi-calendar-check"></i> Book Appointment
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle"></i> No doctors found. Please try different search criteria.
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
+
+

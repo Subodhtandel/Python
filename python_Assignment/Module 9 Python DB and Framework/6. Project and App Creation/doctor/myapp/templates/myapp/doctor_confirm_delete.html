@@ -1,0 +1,19 @@
+{% extends "myapp/base.html" %}
+
+{% block title %}Delete Doctor - Doctor Management System{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <h1>Delete Doctor</h1>
+    <a href="{% url 'doctor-list' %}" class="btn btn-secondary">Back</a>
+</div>
+
+<div class="card">
+    <p>Are you sure you want to delete <strong>Dr. {{ doctor.get_full_name }}</strong>?</p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Yes, Delete</button>
+        <a href="{% url 'doctor-detail' doctor.pk %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}
