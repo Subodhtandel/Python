@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Delete comment{% endblock %}
+{% block content %}
+<div class="col-lg-8 mx-auto">
+  <div class="card border-danger">
+    <div class="card-body">
+      <h1 class="h5 text-danger">Remove this comment?</h1>
+      <p class="small text-muted mb-4">{{ object.body|truncatewords:40 }}</p>
+      <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+        <a href="{{ object.post.get_absolute_url }}" class="btn btn-outline-secondary btn-sm">Cancel</a>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

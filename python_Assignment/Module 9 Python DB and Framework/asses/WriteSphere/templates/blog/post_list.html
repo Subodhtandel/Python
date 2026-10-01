@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block title %}Discover{% endblock %}
+{% block content %}
+<div class="row g-4">
+  <div class="col-lg-3">
+    <div class="card shadow-sm border-0">
+      <div class="card-header bg-transparent fw-semibold">Filters</div>
+      <div class="card-body">
+        <form method="get" action="">
+          <div class="mb-3">
+            <label class="form-label small">Author</label>
+            <select name="author" class="form-select form-select-sm">
+              <option value="">Any author</option>
+              {% for a in authors %}
+                <option value="{{ a.username }}" {% if filter_author == a.username %}selected{% endif %}>{{ a.username }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label small">Category</label>
+            <select name="category" class="form-select form-select-sm">
+              <option value="">Any category</option>
+              {% for c in categories %}
+                <option value="{{ c.slug }}" {% if filter_category == c.slug %}selected{% endif %}>{{ c.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label small">Tag</label>
+            <select name="tag" class="form-select form-select-sm">
+              <option value="">Any tag</option>
+              {% for t in tags %}
+                <option value="{{ t.slug }}" {% if filter_tag == t.slug %}selected{% endif %}>{{ t.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="mb-2">
+            <label class="form-label small">Posted from</label>
+            <input type="date" name="date_from" class="form-control form-control-sm" value="{{ filter_date_from }}">
+          </div>
+          <div class="mb-3">
+            <label class="form-label small">Posted until</label>
+            <input type="date" name="date_to" class="form-control form-control-sm" value="{{ filter_date_to }}">
+          </div>
+          <button type="submit" class="btn btn-primary btn-sm w-100">Apply</button>
+          <a href="{% url 'blog:list' %}" class="btn btn-outline-secondary btn-sm w-100 mt-2">Clear</a>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-9">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h1 class="h3 mb-0">Latest posts</h1>
+      {% if user.is_authenticated and user.can_publish_posts %}
+        <a href="{% url 'blog:create' %}" class="btn btn-sm btn-outline-primary">New post</a>
+      {% endif %}
+    </div>
+    {% if posts %}
+      <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-3">
+        {% for post in posts %}
+          <div class="col">
+            <article class="card post-card shadow-sm border-0 h-100">
+              {% if post.cover_image %}
+                <a href="{{ post.get_absolute_url }}">
+                  <img src="{{ post.cover_image.url }}" class="cover-thumb card-img-top" alt="">
+                </a>
+              {% else %}
+                <div class="cover-thumb"></div>
+              {% endif %}
+              <div class="card-body d-flex flex-column">
+                <span class="text-muted small">
+                  {% if post.category %}<span class="badge text-bg-secondary me-1">{{ post.category.name }}</span>{% endif %}
+                  {{ post.created_at|date:"M j, Y" }}
+                </span>
+                <h2 class="h5 mt-1">
+                  <a href="{{ post.get_absolute_url }}" class="text-decoration-none text-dark">{{ post.title }}</a>
+                </h2>
+                <p class="text-muted flex-grow-1 small">{{ post.excerpt|truncatewords:26|default:"" }}</p>
+                <div class="small mt-auto">
+                  <a href="{% url 'blog:author_profile' username=post.author.username %}">{{ post.author.username }}</a>
+                  <span class="text-muted mx-1">·</span>
+                  <span class="text-muted">{{ post.like_count }} {% if post.like_count == 1 %}like{% else %}likes{% endif %}</span>
+                </div>
+              </div>
+            </article>
+          </div>
+        {% endfor %}
+      </div>
+
+      {% if is_paginated %}
+        <nav class="mt-4" aria-label="Pagination">
+          <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+              <li class="page-item"><a class="page-link" href="?{% for key, val in request.GET.items %}{% if key != 'page' %}{{ key }}={{ val }}&{% endif %}{% endfor %}page={{ page_obj.previous_page_number }}">Previous</a></li>
+            {% endif %}
+            <li class="page-item disabled"><span class="page-link">Page {{ page_obj.number }} of {{ paginator.num_pages }}</span></li>
+            {% if page_obj.has_next %}
+              <li class="page-item"><a class="page-link" href="?{% for key, val in request.GET.items %}{% if key != 'page' %}{{ key }}={{ val }}&{% endif %}{% endfor %}page={{ page_obj.next_page_number }}">Next</a></li>
+            {% endif %}
+          </ul>
+        </nav>
+      {% endif %}
+    {% else %}
+      <div class="alert alert-light border text-center py-5">No posts match your filters yet.</div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

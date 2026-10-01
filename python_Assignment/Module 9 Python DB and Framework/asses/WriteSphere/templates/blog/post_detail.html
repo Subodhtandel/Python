@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block title %}{{ post.title }}{% endblock %}
+{% block content %}
+<article class="mx-auto" style="max-width:760px;">
+  {% if post.cover_image %}
+    <img src="{{ post.cover_image.url }}" class="rounded w-100 mb-4 cover-thumb" alt="" style="max-height:360px;">
+  {% endif %}
+
+  <header class="mb-4">
+    <p class="text-muted mb-2 small">
+      {% if post.category %}
+        <a href="{% url 'blog:list' %}?category={{ post.category.slug }}">{{ post.category.name }}</a>
+      {% endif %}
+      {% if not post.is_published %}<span class="badge bg-warning text-dark ms-1">Draft</span>{% endif %}
+    </p>
+    <h1 class="display-6">{{ post.title }}</h1>
+    <div class="d-flex flex-wrap align-items-center gap-2 text-muted small">
+      <span>By <a href="{% url 'blog:author_profile' username=post.author.username %}">{{ post.author.username }}</a></span>
+      <span>· Updated {{ post.updated_at|date:"M j, Y" }}</span>
+    </div>
+    {% if post.tags.exists %}
+      <div class="mt-2">
+        {% for tag in post.tags.all %}
+          <a class="badge text-bg-light text-dark text-decoration-none me-1" href="{% url 'blog:list' %}?tag={{ tag.slug }}">#{{ tag.name }}</a>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </header>
+
+  <div class="post-content lh-lg">{{ post.content|safe }}</div>
+
+  {% if user.is_authenticated %}
+    {% if post.author_id == user.id or user.is_superuser or user.role == 'admin' %}
+      <div class="mt-4 d-flex gap-2">
+        <a href="{% url 'blog:edit' slug=post.slug %}" class="btn btn-outline-secondary btn-sm">Edit</a>
+        <a href="{% url 'blog:delete' slug=post.slug %}" class="btn btn-outline-danger btn-sm">Delete</a>
+      </div>
+    {% endif %}
+  {% endif %}
+
+  <hr class="my-5">
+
+  <div class="d-flex align-items-center flex-wrap gap-3 mb-4">
+    {% if user.is_authenticated %}
+      <form action="{% url 'blog:like_toggle' slug=post.slug %}" method="post" class="d-inline">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-sm {% if user_liked %}btn-outline-danger{% else %}btn-outline-primary{% endif %}">
+          {% if user_liked %}♥ Liked{% else %}♡ Like{% endif %} ({{ like_count }})
+        </button>
+      </form>
+    {% else %}
+      <p class="mb-0 text-muted small"><a href="{% url 'accounts:login' %}?next={{ request.path }}">Login</a> to like posts.</p>
+      <span class="text-muted small">{{ like_count }} likes</span>
+    {% endif %}
+  </div>
+
+  <section>
+    <h2 class="h5 mb-3">Comments</h2>
+
+    {% if comment_form %}
+      <form method="post" class="mb-4">
+        {% csrf_token %}
+        <div class="mb-2">
+          {{ comment_form.body }}
+          {{ comment_form.body.errors }}
+        </div>
+        <button type="submit" class="btn btn-primary btn-sm">Comment</button>
+      </form>
+    {% endif %}
+
+    {% if post.comments.all %}
+      <ul class="list-group list-group-flush">
+        {% for c in post.comments.all %}
+          <li class="list-group-item px-0">
+            <strong>{{ c.author.username }}</strong>
+            <small class="text-muted ms-1">{{ c.created_at|timesince }} ago</small>
+            <p class="mb-2 mt-1">{{ c.body|linebreaksbr }}</p>
+            {% if user.is_authenticated and c.author_id == user.id %}
+              <a href="{% url 'blog:comment_edit' pk=c.pk %}" class="small">Edit</a>
+              ·
+              <a href="{% url 'blog:comment_delete' pk=c.pk %}" class="small text-danger">Delete</a>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="text-muted small">No comments yet—start the conversation.</p>
+    {% endif %}
+  </section>
+
+  <p class="mt-4 mb-0">
+    <a href="{% url 'blog:list' %}" class="text-decoration-none">← Back to posts</a>
+  </p>
+</article>
+{% endblock %}

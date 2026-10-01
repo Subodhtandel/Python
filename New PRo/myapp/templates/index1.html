@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Power Gym - Member Attendance Dashboard</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Custom Color Palette Configuration -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brandRed: '#C91C1C',
+            brandDarkRed: '#8A1C1C',
+            brandDark: '#1E2124',
+            brandGray: '#D9D9D9',
+            brandBg: '#121417',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #121417;
+      color: #D9D9D9;
+    }
+  </style>
+</head>
+<body class="min-h-screen pb-12">
+
+  <!-- Header -->
+  <header class="bg-brandDark border-b border-brandDarkRed/40 p-4 sticky top-0 z-50 shadow-2xl">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 px-2">
+      
+      <!-- Gym Logo & Title -->
+      <div class="flex items-center gap-3">
+        <div class="bg-brandRed text-white p-3 rounded-xl shadow-lg shadow-brandRed/30">
+          <i class="fa-solid fa-dumbbell text-2xl"></i>
+        </div>
+        <div>
+          <h1 class="text-xl font-extrabold tracking-wider text-white">POWER FIT GYM</h1>
+          <p class="text-xs text-brandGray/70">Attendance & Management Portal</p>
+        </div>
+      </div>
+
+      <!-- Controls: Selectors & One-Click Admin Panel Button -->
+      <div class="flex flex-wrap items-center gap-3">
+        
+        <!-- Member Select -->
+        <div>
+          <label class="text-[11px] uppercase tracking-wider text-brandGray/80 block mb-1">Select Member</label>
+          <select id="memberSelect" onchange="loadMemberData()" class="bg-brandBg text-white text-sm rounded-lg border border-brandDarkRed/50 p-2.5 focus:ring-2 focus:ring-brandRed outline-none cursor-pointer">
+            <!-- Loaded dynamically from Django backend -->
+          </select>
+        </div>
+
+        <!-- Month Select -->
+        <div>
+          <label class="text-[11px] uppercase tracking-wider text-brandGray/80 block mb-1">Select Month</label>
+          <input type="month" id="monthPicker" value="2026-10" onchange="loadMemberData()" class="bg-brandBg text-white text-sm rounded-lg border border-brandDarkRed/50 p-2 focus:ring-2 focus:ring-brandRed outline-none cursor-pointer">
+        </div>
+
+        <!-- 🚀 One Click Admin Panel Button -->
+        <!-- 🚀 Admin Panel Button (Only visible if Admin is logged in) -->
+{% if user.is_authenticated and user.is_staff %}
+<div class="self-end">
+  <a href="/admin/" target="_blank" class="flex items-center gap-2 bg-brandRed hover:bg-brandDarkRed text-white font-semibold text-sm px-4 py-2.5 rounded-lg border border-brandRed shadow-lg shadow-brandRed/20 transition-all transform hover:-translate-y-0.5">
+    <i class="fa-solid fa-user-shield"></i>
+    <span>Admin Panel</span>
+  </a>
+</div>
+{% else %}
+<div class="self-end">
+  <a href="/admin/login/?next=/" class="flex items-center gap-2 bg-brandDark border border-brandDarkRed/60 hover:bg-brandDarkRed text-brandGray text-xs px-3 py-2.5 rounded-lg transition-all">
+    <i class="fa-solid fa-lock text-brandRed"></i>
+    <span>Admin Login</span>
+  </a>
+</div>
+{% endif %}
+
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="max-w-7xl mx-auto px-4 mt-8">
+    
+    <!-- Profile & KPI Summary Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      
+      <!-- Member Info Profile Card -->
+      <div class="bg-brandDark border border-brandDarkRed/40 rounded-2xl p-5 flex flex-col items-center text-center shadow-xl">
+        <img id="memberAvatar" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150" alt="Profile" class="w-20 h-20 rounded-full border-4 border-brandRed object-cover mb-3 shadow-md">
+        <h2 id="memberName" class="text-lg font-bold text-white">Loading...</h2>
+        <span id="memberPlan" class="bg-brandDarkRed/30 text-brandRed text-xs px-3 py-1 rounded-full font-semibold border border-brandDarkRed/60 my-2">--</span>
+        <p id="memberJoinDate" class="text-xs text-brandGray/60">Joined: --</p>
+      </div>
+
+      <!-- Total Month Days KPI -->
+      <div class="bg-brandDark border border-brandDarkRed/40 rounded-2xl p-5 flex items-center justify-between shadow-xl">
+        <div>
+          <p class="text-xs text-brandGray/70 uppercase font-bold tracking-wider">Total Month Days</p>
+          <h3 id="totalDays" class="text-3xl font-extrabold text-white mt-2">31</h3>
+          <p id="monthLabel" class="text-xs text-brandGray/60 mt-1">October 2026</p>
+        </div>
+        <div class="bg-brandBg text-brandGray p-4 rounded-xl border border-brandGray/20">
+          <i class="fa-solid fa-calendar-days text-2xl"></i>
+        </div>
+      </div>
+
+      <!-- Present Days KPI -->
+      <div class="bg-brandDark border border-brandDarkRed/40 rounded-2xl p-5 flex items-center justify-between shadow-xl">
+        <div>
+          <p class="text-xs text-emerald-400 uppercase font-bold tracking-wider">Present Days</p>
+          <h3 id="presentDays" class="text-3xl font-extrabold text-emerald-400 mt-2">0</h3>
+          <p class="text-xs text-emerald-500/80 mt-1">Attended Gym</p>
+        </div>
+        <div class="bg-emerald-500/10 text-emerald-400 p-4 rounded-xl border border-emerald-500/20">
+          <i class="fa-solid fa-circle-check text-2xl"></i>
+        </div>
+      </div>
+
+      <!-- Absent Days KPI -->
+      <div class="bg-brandDark border border-brandDarkRed/40 rounded-2xl p-5 flex items-center justify-between shadow-xl">
+        <div>
+          <p class="text-xs text-brandRed uppercase font-bold tracking-wider">Absent Days</p>
+          <h3 id="absentDays" class="text-3xl font-extrabold text-brandRed mt-2">0</h3>
+          <p id="attendancePercentage" class="text-xs text-brandRed/80 mt-1">0% Attendance Rate</p>
+        </div>
+        <div class="bg-brandRed/10 text-brandRed p-4 rounded-xl border border-brandRed/30">
+          <i class="fa-solid fa-circle-xmark text-2xl"></i>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Attendance Interactive Grid -->
+    <div class="bg-brandDark border border-brandDarkRed/40 rounded-2xl p-6 shadow-2xl mb-8">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 pb-4 border-b border-brandDarkRed/30">
+        <div>
+          <h3 class="text-lg font-bold text-white flex items-center gap-2">
+            <i class="fa-solid fa-calendar-check text-brandRed"></i> Daily Attendance Calendar
+          </h3>
+          <p class="text-xs text-brandGray/70 mt-1">Click on any day box to toggle status: <strong class="text-emerald-400">Present</strong> → <strong class="text-brandRed">Absent</strong> → <strong class="text-brandGray">Off</strong></p>
+        </div>
+        
+        <!-- Legend Badges -->
+        <div class="flex items-center gap-4 text-xs font-semibold">
+          <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-emerald-500"></span> Present</span>
+          <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-brandRed"></span> Absent</span>
+          <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-brandBg border border-brandGray/40"></span> Off</span>
+        </div>
+      </div>
+
+      <!-- Days Grid Container -->
+      <div id="calendarGrid" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-3">
+        <!-- JS Grid Render -->
+      </div>
+    </div>
+
+  </main>
+
+  <!-- JavaScript Django REST API Integration -->
+  <script>
+    let membersList = [];
+    let currentAttendanceData = {};
+
+    function getDaysInMonth(yearMonth) {
+      const [year, month] = yearMonth.split('-').map(Number);
+      return new Date(year, month, 0).getDate();
+    }
+
+    // 1. Initial Load: Fetch Members from Django API
+    async function initDashboard() {
+      try {
+        const res = await fetch('/api/members/');
+        membersList = await res.json();
+
+        const select = document.getElementById('memberSelect');
+        select.innerHTML = '';
+
+        if (membersList.length === 0) {
+          select.innerHTML = '<option>No Members Found (Add via Admin)</option>';
+          return;
+        }
+
+        membersList.forEach(m => {
+          const opt = document.createElement('option');
+          opt.value = m.id;
+          opt.innerText = `${m.name} (ID: #${m.id + 100})`;
+          select.appendChild(opt);
+        });
+
+        loadMemberData();
+      } catch (err) {
+        console.error("Error connecting to Django backend:", err);
+      }
+    }
+
+    // 2. Fetch Selected Member's Data & Attendance
+    async function loadMemberData() {
+      const memberId = document.getElementById('memberSelect').value;
+      const monthPicker = document.getElementById('monthPicker').value;
+
+      if (!memberId) return;
+
+      const currentMember = membersList.find(m => m.id == memberId);
+      if (!currentMember) return;
+
+      // Update Profile Info
+      document.getElementById('memberName').innerText = currentMember.name;
+      document.getElementById('memberPlan').innerText = currentMember.plan;
+      document.getElementById('memberAvatar').src = currentMember.avatar;
+      document.getElementById('memberJoinDate').innerText = `Joined: ${currentMember.join_date}`;
+
+      const totalDays = getDaysInMonth(monthPicker);
+      document.getElementById('totalDays').innerText = totalDays;
+
+      // Format Month Label
+      const [year, monthStr] = monthPicker.split('-');
+      const dateObj = new Date(year, monthStr - 1);
+      document.getElementById('monthLabel').innerText = dateObj.toLocaleString('en-US', { month: 'long', year: 'numeric' });
+
+      // Fetch Attendance Map from Django
+      try {
+        const res = await fetch(`/api/attendance/${memberId}/${monthPicker}/`);
+        currentAttendanceData = await res.json();
+
+        // Calculate KPI Counts
+        let presentCount = 0;
+        let absentCount = 0;
+
+        for (let d = 1; d <= totalDays; d++) {
+          if (currentAttendanceData[d] === 'present') presentCount++;
+          if (currentAttendanceData[d] === 'absent') absentCount++;
+        }
+
+        const activeDays = presentCount + absentCount;
+        const pct = activeDays > 0 ? ((presentCount / activeDays) * 100).toFixed(1) : 0;
+
+        document.getElementById('presentDays').innerText = presentCount;
+        document.getElementById('absentDays').innerText = absentCount;
+        document.getElementById('attendancePercentage').innerText = `${pct}% Attendance Rate`;
+
+        renderCalendar(memberId, monthPicker, totalDays);
+      } catch (err) {
+        console.error("Failed to fetch attendance:", err);
+      }
+    }
+
+    // 3. Render Calendar Grid Cards
+    function renderCalendar(memberId, yearMonth, totalDays) {
+      const grid = document.getElementById('calendarGrid');
+      grid.innerHTML = '';
+
+      for (let day = 1; day <= totalDays; day++) {
+        const status = currentAttendanceData[day] || 'off';
+
+        let badgeStyle = "bg-brandBg/60 border-brandDarkRed/30 text-brandGray/60";
+        let icon = "fa-minus";
+        let label = "Off";
+
+        if (status === 'present') {
+          badgeStyle = "bg-emerald-500/20 border-emerald-500/60 text-emerald-400 font-bold shadow-lg shadow-emerald-500/10";
+          icon = "fa-check";
+          label = "Present";
+        } else if (status === 'absent') {
+          badgeStyle = "bg-brandRed/20 border-brandRed/60 text-brandRed font-bold shadow-lg shadow-brandRed/10";
+          icon = "fa-xmark";
+          label = "Absent";
+        }
+
+        const dayCard = document.createElement('div');
+        dayCard.className = `border rounded-xl p-3 flex flex-col justify-between cursor-pointer transition-all transform hover:scale-105 select-none ${badgeStyle}`;
+        dayCard.onclick = () => toggleAttendanceStatus(memberId, yearMonth, day, status);
+
+        dayCard.innerHTML = `
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-semibold opacity-70">Day ${day}</span>
+            <i class="fa-solid ${icon} text-sm"></i>
+          </div>
+          <div class="mt-2 text-center">
+            <span class="text-sm font-bold block tracking-wide">${label}</span>
+          </div>
+        `;
+
+        grid.appendChild(dayCard);
+      }
+    }
+
+    // 4. Toggle Status On Click & Post to Django REST API
+    async function toggleAttendanceStatus(memberId, yearMonth, day, currentStatus) {
+      let nextStatus = 'present';
+      if (currentStatus === 'present') nextStatus = 'absent';
+      else if (currentStatus === 'absent') nextStatus = 'off';
+
+      const formattedDay = String(day).padStart(2, '0');
+      const dateStr = `${yearMonth}-${formattedDay}`;
+
+      try {
+        const res = await fetch('/api/attendance/toggle/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            memberId: parseInt(memberId),
+            dateStr: dateStr,
+            status: nextStatus
+          })
+        });
+
+        if (res.ok) {
+          loadMemberData(); // Refresh calendar & KPIs
+        }
+      } catch (err) {
+        console.error("Error toggling attendance:", err);
+      }
+    }
+
+    // Start App
+    window.onload = initDashboard;
+  </script>
+</body>
+</html>
